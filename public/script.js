@@ -1,5 +1,5 @@
 // Get local IP dynamically (to be replaced during deployment)
-const LOCAL_IP = 'SERVER_IP';
+const LOCAL_IP = window.location.hostname;
 const socket = io(`http://${LOCAL_IP}:3000`);
 
 let uniqueId;
