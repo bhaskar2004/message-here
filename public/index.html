@@ -53,6 +53,12 @@
                     >
                         Discover Local Devices
                     </button>
+                    <button 
+                        id="manualConnectBtn" 
+                        class="ml-2 bg-white text-blue-500 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
+                    >
+                        Manual Connect
+                    </button>
                     <div id="deviceListContainer" class="mt-2 max-h-40 overflow-y-auto"></div>
                 </div>
 
@@ -107,6 +113,37 @@
                         class="hidden" 
                         accept="*/*"
                     >
+                </div>
+            </div>
+        </div>
+
+        <!-- Manual Connect Modal -->
+        <div id="manualConnectModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+            <div class="bg-white p-6 rounded-lg w-96">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">Manual Device Connection</h2>
+                    <button id="closeManualConnectModal" class="text-gray-600 hover:text-gray-900">
+                        <i class="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Enter Device ID to Connect</label>
+                    <input 
+                        type="text" 
+                        id="manualConnectInput" 
+                        placeholder="Enter Device ID" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    >
+                </div>
+                
+                <div class="flex justify-end space-x-2">
+                    <button 
+                        id="manualConnectSubmitBtn" 
+                        class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                    >
+                        Connect
+                    </button>
                 </div>
             </div>
         </div>

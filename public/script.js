@@ -22,43 +22,99 @@ const elements = {
     fileShareBtn: document.getElementById('fileShareBtn'),
     fileInput: document.getElementById('fileInput'),
     deviceDiscoveryBtn: document.getElementById('deviceDiscoveryBtn'),
-    deviceListContainer: document.getElementById('deviceListContainer')
+    deviceListContainer: document.getElementById('deviceListContainer'),
+    manualConnectModal: document.getElementById('manualConnectModal'),
+    manualConnectInput: document.getElementById('manualConnectInput'),
+    manualConnectSubmitBtn: document.getElementById('manualConnectSubmitBtn'),
+    closeManualConnectModal: document.getElementById('closeManualConnectModal')
 };
 
-// Local Network Device Discovery
+// Advanced Local Network Device Discovery
 async function discoverLocalDevices() {
     try {
-        console.log('Starting device discovery...');
-        const response = await fetch('/discover-devices');
+        console.log('Starting advanced device discovery...');
+        elements.deviceListContainer.innerHTML = '<div class="p-2">Searching for devices...</div>';
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        // Broadcast device discovery
+        const broadcastDiscovery = () => {
+            return new Promise((resolve) => {
+                socket.emit('broadcast-discovery', { 
+                    uniqueId: uniqueId, 
+                    hostname: window.location.hostname 
+                });
+
+                // Wait for responses
+                socket.on('discovery-response', (devices) => {
+                    resolve(devices);
+                });
+
+                // Timeout discovery after 10 seconds
+                setTimeout(() => {
+                    resolve([]);
+                }, 10000);
+            });
+        };
+
+        const discoveredDevices = await broadcastDiscovery();
         
-        const data = await response.json();
-        console.log('Discovered devices:', data);
+        console.log('Discovered devices:', discoveredDevices);
         
-        localDevices = data;
-        
-        if (!localDevices || localDevices.length === 0) {
-            elements.deviceListContainer.innerHTML = '<div class="p-2">No devices found</div>';
+        if (!discoveredDevices || discoveredDevices.length === 0) {
+            elements.deviceListContainer.innerHTML = '<div class="p-2 text-yellow-600">No devices found</div>';
             return;
         }
         
-        // Rest of your existing code...
-        
+        // Render discovered devices
+        elements.deviceListContainer.innerHTML = discoveredDevices.map(device => `
+            <div class="bg-gray-100 p-2 rounded-lg mb-2 flex justify-between items-center">
+                <div>
+                    <strong>${device.hostname}</strong>
+                    <p class="text-sm text-gray-600">ID: ${device.uniqueId}</p>
+                </div>
+                <button 
+                    class="connect-device-btn bg-blue-500 text-white px-2 py-1 rounded"
+                    data-id="${device.uniqueId}"
+                >
+                    Connect
+                </button>
+            </div>
+        `).join('');
+
+        // Add event listeners to connect buttons
+        document.querySelectorAll('.connect-device-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.dataset.id;
+                initiateConnectionRequest(targetId);
+            });
+        });
+
     } catch (error) {
         console.error('Device discovery failed:', error);
         elements.deviceListContainer.innerHTML = 
             `<div class="p-2 text-red-500">Error: ${error.message}</div>`;
     }
 }
-function connectToLocalDevice(ip, port) {
-    // Emit local device connection request
-    socket.emit('local-connect', { 
-        ip: ip, 
-        port: port,
-        uniqueId: uniqueId
+
+// Manual Connection Function
+function initiateManualConnection() {
+    const targetId = elements.manualConnectInput.value.trim();
+    if (targetId) {
+        initiateConnectionRequest(targetId);
+        elements.manualConnectModal.classList.add('hidden');
+        elements.manualConnectInput.value = '';
+    }
+}
+
+// Connection Request Initiation
+function initiateConnectionRequest(targetId) {
+    if (!uniqueId) {
+        alert('Please generate a User ID first');
+        return;
+    }
+
+    socket.emit('send connection request', {
+        from: uniqueId,
+        to: targetId
     });
 }
 
@@ -96,15 +152,16 @@ elements.deviceDiscoveryBtn.addEventListener('click', () => {
     discoverLocalDevices();
 });
 
-// Socket event for local connection response
-socket.on('local-connection-response', (response) => {
-    if (response.status === 'success') {
-        alert('Connected to local device successfully!');
-    } else {
-        alert('Failed to connect to local device');
-    }
+// Manual Connection Modal Handlers
+elements.manualConnectBtn.addEventListener('click', () => {
+    elements.manualConnectModal.classList.remove('hidden');
 });
 
+elements.closeManualConnectModal.addEventListener('click', () => {
+    elements.manualConnectModal.classList.add('hidden');
+});
+
+elements.manualConnectSubmitBtn.addEventListener('click', initiateManualConnection);
 
 // Handle incoming connection requests
 socket.on('connection request', ({ from }) => {

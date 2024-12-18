@@ -82,6 +82,9 @@ const connections = {};
 const pendingRequests = {};
 const localDevices = new Set();
 
+// Store discovered devices
+const discoveredDevices = new Set();
+
 // mDNS Service Advertisement
 const ad = mdns.createAdvertisement(mdns.tcp('http'), PORT, {
     name: `SecureChat-${os.hostname()}`
@@ -97,6 +100,23 @@ io.on('connection', (socket) => {
         console.log('Local device registered:', deviceInfo);
     });
 
+    // Advanced Device Discovery
+    socket.on('broadcast-discovery', (deviceInfo) => {
+        // Add device to discovered devices
+        discoveredDevices.add({
+            uniqueId: deviceInfo.uniqueId,
+            hostname: deviceInfo.hostname,
+            socketId: socket.id
+        });
+
+        // Respond with list of discovered devices
+        const devices = Array.from(discoveredDevices);
+        socket.emit('discovery-response', devices);
+
+        // Broadcast to other connected clients
+        socket.broadcast.emit('discovery-response', devices);
+    });
+
     // User registration
     socket.on('register', (uniqueId) => {
         users[uniqueId] = socket.id;
@@ -106,7 +126,6 @@ io.on('connection', (socket) => {
     // Local network connection request
     socket.on('local-connect', (deviceInfo) => {
         console.log('Local connection request:', deviceInfo);
-        // Implement local network connection logic
         socket.emit('local-connection-response', { 
             status: 'success', 
             message: 'Connected to local device' 
@@ -190,6 +209,7 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Clean up discovered devices on disconnect
     socket.on('disconnect', () => {
         for (const [id, socketId] of Object.entries(users)) {
             if (socketId === socket.id) {
@@ -199,6 +219,14 @@ io.on('connection', (socket) => {
                 break;
             }
         }
+
+        // Remove devices associated with this socket
+        for (let device of discoveredDevices) {
+            if (device.socketId === socket.id) {
+                discoveredDevices.delete(device);
+            }
+        }
+
         console.log('User disconnected');
     });
 });
