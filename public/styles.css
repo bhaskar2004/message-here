@@ -1,0 +1,94 @@
+/* Custom styles to enhance the Tailwind base */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.request-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f4f8;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.request-item:hover {
+    background-color: #e6f2ff;
+}
+
+.request-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.request-buttons button {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    transition: opacity 0.3s ease;
+}
+
+.request-buttons .acceptBtn {
+    background-color: #48bb78;
+    color: white;
+}
+
+.request-buttons .acceptBtn:hover {
+    opacity: 0.9;
+}
+
+.request-buttons .rejectBtn {
+    background-color: #f56565;
+    color: white;
+}
+
+.request-buttons .rejectBtn:hover {
+    opacity: 0.9;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        max-width: 100%;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .bg-blue-500 {
+        padding: 4rem 2rem;
+    }
+
+    #appContainer {
+        padding: 2rem;
+    }
+}
+
+/* Animation for new messages */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#userMessageArea > div {
+    animation: fadeIn 0.3s ease;
+}

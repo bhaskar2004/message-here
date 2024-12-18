@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Local Chat</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Remixicon for icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="container mx-auto max-w-4xl p-6 bg-white rounded-xl shadow-lg">
+        <div class="grid grid-cols-3 gap-6">
+            <!-- User Setup Section -->
+            <div class="bg-blue-500 text-white p-6 rounded-lg">
+                <h1 class="text-2xl font-bold mb-4">Secure Local Chat</h1>
+                
+                <div class="mb-4">
+                    <button id="generateIdBtn" class="bg-white text-blue-500 px-4 py-2 rounded-lg hover:bg-blue-100 transition">
+                        Generate User ID
+                    </button>
+                    <p id="userIdDisplay" class="mt-2 hidden"></p>
+                </div>
+                
+                <div class="mb-4">
+                    <h3 class="font-semibold mb-2">Connect to User</h3>
+                    <div class="flex">
+                        <input 
+                            type="text" 
+                            id="connectIdInput" 
+                            placeholder="Enter User ID" 
+                            class="w-full px-3 py-2 rounded-l-lg text-gray-800"
+                        >
+                        <button 
+                            id="connectBtn" 
+                            class="bg-green-500 text-white px-4 py-2 rounded-r-lg hover:bg-green-600"
+                        >
+                            Connect
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <button 
+                        id="deviceDiscoveryBtn" 
+                        class="bg-white text-blue-500 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
+                    >
+                        Discover Local Devices
+                    </button>
+                    <div id="deviceListContainer" class="mt-2 max-h-40 overflow-y-auto"></div>
+                </div>
+
+                <div id="notificationArea" class="mt-4 hidden">
+                    <h3 class="font-semibold mb-2">Connection Requests</h3>
+                    <div id="requests"></div>
+                </div>
+            </div>
+            
+            <!-- Chat Application -->
+            <div id="appContainer" class="col-span-2 bg-gray-50 p-6 rounded-lg hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-800">Chat</h2>
+                    <button 
+                        id="encryptToggle" 
+                        class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg flex items-center"
+                    >
+                        <i class="ri-lock-line mr-2"></i>Encryption: OFF
+                    </button>
+                </div>
+                
+                <div 
+                    id="userMessageArea" 
+                    class="h-96 overflow-y-auto bg-white border border-gray-200 rounded-lg p-4 mb-4"
+                ></div>
+                
+                <div class="flex">
+                    <input 
+                        type="text" 
+                        id="userInput" 
+                        placeholder="Type your message..." 
+                        class="flex-grow px-3 py-2 border border-gray-300 rounded-l-lg"
+                    >
+                    <button 
+                        id="sendBtn" 
+                        class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600"
+                    >
+                        Send
+                    </button>
+                </div>
+                
+                <div class="mt-4 flex space-x-4">
+                    <button 
+                        id="fileShareBtn" 
+                        class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 flex items-center"
+                    >
+                        <i class="ri-upload-line mr-2"></i>Share File
+                    </button>
+                    <input 
+                        type="file" 
+                        id="fileInput" 
+                        class="hidden" 
+                        accept="*/*"
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Socket.IO and Dependencies -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
