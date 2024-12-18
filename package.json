@@ -1,15 +1,19 @@
 {
-    "name": "secure-messaging-app",
+    "name": "secure-local-chat",
     "version": "1.0.0",
-    "description": "Secure Real-Time Messaging Application",
-    "main": "server.js",
     "scripts": {
-        "start": "node server.js"
+      "start": "node server/server.js",
+      "client": "npx live-server client",
+      "test": "jest",
+      "build": "webpack"
     },
     "dependencies": {
-        "express": "^4.17.1",
-        "mdns-js": "^1.0.3",
-        "multer": "^1.4.4",
-        "socket.io": "^4.2.0"
+      "express": "^4.17.1",
+      "socket.io": "^4.2.0",
+      "webrtc-adapter": "^8.0.0"
+    },
+    "devDependencies": {
+      "jest": "^27.0.6",
+      "webpack": "^5.44.0"
     }
-}
+  }
