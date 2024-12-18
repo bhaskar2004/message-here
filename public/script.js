@@ -28,45 +28,31 @@ const elements = {
 // Local Network Device Discovery
 async function discoverLocalDevices() {
     try {
+        console.log('Starting device discovery...');
         const response = await fetch('/discover-devices');
-        localDevices = await response.json();
         
-        // Clear previous device list
-        elements.deviceListContainer.innerHTML = '';
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
-        // Populate device list
-        localDevices.forEach(device => {
-            const deviceElement = document.createElement('div');
-            deviceElement.classList.add('device-item', 'bg-gray-100', 'p-2', 'rounded', 'mb-2');
-            deviceElement.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <span>${device.hostname} (${device.ip}:${device.port})</span>
-                    <button 
-                        class="connect-device-btn bg-blue-500 text-white px-2 py-1 rounded"
-                        data-ip="${device.ip}"
-                        data-port="${device.port}"
-                    >
-                        Connect
-                    </button>
-                </div>
-            `;
-            elements.deviceListContainer.appendChild(deviceElement);
-        });
-
-        // Add event listeners to connect buttons
-        document.querySelectorAll('.connect-device-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const ip = e.target.dataset.ip;
-                const port = e.target.dataset.port;
-                connectToLocalDevice(ip, port);
-            });
-        });
+        const data = await response.json();
+        console.log('Discovered devices:', data);
+        
+        localDevices = data;
+        
+        if (!localDevices || localDevices.length === 0) {
+            elements.deviceListContainer.innerHTML = '<div class="p-2">No devices found</div>';
+            return;
+        }
+        
+        // Rest of your existing code...
+        
     } catch (error) {
-        console.error('Device discovery failed', error);
-        alert('Failed to discover devices');
+        console.error('Device discovery failed:', error);
+        elements.deviceListContainer.innerHTML = 
+            `<div class="p-2 text-red-500">Error: ${error.message}</div>`;
     }
 }
-
 function connectToLocalDevice(ip, port) {
     // Emit local device connection request
     socket.emit('local-connect', { 
@@ -105,7 +91,10 @@ document.getElementById('generateIdBtn').addEventListener('click', () => {
 });
 
 // Add device discovery button event listener
-elements.deviceDiscoveryBtn.addEventListener('click', discoverLocalDevices);
+elements.deviceDiscoveryBtn.addEventListener('click', () => {
+    console.log('Discovery button clicked');
+    discoverLocalDevices();
+});
 
 // Socket event for local connection response
 socket.on('local-connection-response', (response) => {
